@@ -106,26 +106,26 @@ const modify = (req, res) => {
 //DESTROY CONTROLLER
 
 const destroy = (req, res) => {
-    console.log('Sei nella rotta DESTROY')
-    //STESSA LOGICA DELLA ROTTA SHOW
+    
+    //SALVO IL PARAMETRO DINAMICO DELL'UTENTE
     const id = parseInt(req.params.id)
-    const macchina = macchine.find(macchina => macchina.id === id)
-    if (!macchina) {
-        res.status(404)
-        res.send(
-            {
-                status: 404,
-                error: 'Nessuna macchina da eliminare trovata'
-            }
-        )
-    } else { //ALTRIMENTI
-        //USO IL METODO SPLICE SUL MIO ARRAY CON LE RISORSE E DICO:
-        macchine.splice(macchine.indexOf(macchina), 1) //PARTI DALL'ELEMENTO CON L'INDICE DELL'ELEMENTO SELEZIONATO CON IL PARAM. DINAMIOC E RIMUOVILO
-        console.log(macchine);
+
+    //SALVO LA MIA QUERY AL DATABASE CON IL SEGANPOSTO
+    const sqlQuery = 'DELETE FROM posts WHERE id = ?'
+
+    connection.query(sqlQuery, [id], (err, results) => {
+
+        //GESTISCO L'ERRORE LATO SERVER
+        if (err) return res.status(500).json({error: 'Errore nel database', status: 500})
+        /* console.log(results); */
+        
+        //GESTISCO L'ERRORE LATO CLIENT
+        if (results.length == 0) return res.status(404).json({ error: 'Nessun post da eliminare', status: 404 })
+        
+        //SE NON ENTRA NELLE DUE CONDIZIONI RESTIUTISCO LO STATUS CORRETTO
         res.sendStatus(204)
-
-
-    }
+    })
+    
 
 }
 
