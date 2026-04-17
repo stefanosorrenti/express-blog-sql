@@ -1,26 +1,24 @@
 //IMPORTS
 const macchine = require('../data/macchine')
-
+const connection = require('../database/db')
 //CONTROLLERS (Salvo con le arrow function della variabile con i rispettivi nomi di ogni rotta)
 
 //INDEX CONTROLLER
 const index = (req, res) => {
 
-    let filtredBytag = macchine //VARIABILE D'APPOGGIO CHE HA IL VALORE DELLA RISORSA 'BASE', NEL CASO VOLESSIMO FILTARE LA NOSTRA RICERCA TRAMITE QUERY STRING
-    const tagQuery = req.query.tag //SALVO IN UNA VARIABILE LA IL VALORE DELLA QUERY 'TAG' CHE, TEORICAMENTE, L'UTENTE VUOLE VISITARE
-    console.log('Sei nella rotta INDEX')
+    //SALVIAMO LA QUERY DA FARE AL DATABSE IN UNA VARIABILE
+    const sqlQuery = 'SELECT * FROM posts'
 
-    if (tagQuery) { //SE LA QUERY TAG ESISTE
+    //RECUPERO LA MIA VARIABILE PER LA CONNESSIONE AL DATABASE E UTILIZZO IL METODO QUERY PER FARE DELLE RCIHIESTE AL DATABSE 
+    connection.query(sqlQuery, (err, results) => { //PASSO UNA CALLBACK CON DUE PARAMETRI: ERR CHE SARà UN OGGETTO CONTENTE L'ERRORE, E RESULTS NON SARà ALTRO CHE LA MIA TABELLA
 
-        //LA VARIABILE D'APPOGGIO ASSUEME IL VALORE DELLE MIA RISORSA FILTRATA OVVERO:
-        filtredBytag = macchine.filter(macchina => macchina.tag.includes(tagQuery)) //RESTITUISCIMI SOLO IL GLI ELEMENTI DELL'ARRAY (CHE SONO OGGETTI) CHE HANNO IL VALORE (PARLIAMO DI STRINGE) 
-        // DELLA CHIAVE 'TAG' UGUALE A QUELLO DELLA QUERY STRING 
-        
+        //INDICO UNA CONDIZIONE IN CASO L'ERRORE ESISTE E LO GESTISCO
+        if (err) return res.status(500).json({ error: 'Errore interno nel database', status: 500 }) 
 
-    } else { //ALTRIMENTI 
+        //NON MI SERVE METTERE L'ELSE PERCHE' HO CHIUSO LA CONDIZIONE CON IL RETURN E IMPOSTA LA RES DELLA MIA API UGUALE ALLA TABELLA PARSATE IN JSON
+        res.json(results)
+    })
 
-        res.json(filtredBytag) //RESTITUSCI LA VARIABILE D'APPOGGIO CON IL VALORE DELLA RISORSA 'BASE'
-    }
 
 
 }
@@ -71,7 +69,7 @@ const show = (req, res) => {
 const update = (req, res) => {
     //APPLICO LA STESSA LOGICA DELLA ROTTA SHOW
     console.log('Sei nella rotta UPDATE')
-    const id = parseInt(req.params.id) 
+    const id = parseInt(req.params.id)
     const { marca, modello, cavalli, prezzo, tag } = req.body
     const macchina = macchine.find(macchina => macchina.id === id)
 
