@@ -13,7 +13,7 @@ const index = (req, res) => {
     connection.query(sqlQuery, (err, results) => { //PASSO UNA CALLBACK CON DUE PARAMETRI: ERR CHE SARà UN OGGETTO CONTENTE L'ERRORE, E RESULTS NON SARà ALTRO CHE LA MIA TABELLA
 
         //INDICO UNA CONDIZIONE IN CASO L'ERRORE ESISTE E LO GESTISCO
-        if (err) return res.status(500).json({ error: 'Errore interno nel database', status: 500 }) 
+        if (err) return res.status(500).json({ error: 'Errore interno nel database', status: 500 })
 
         //NON MI SERVE METTERE L'ELSE PERCHE' HO CHIUSO LA CONDIZIONE CON IL RETURN E IMPOSTA LA RES DELLA MIA API UGUALE ALLA TABELLA PARSATE IN JSON
         res.json(results)
@@ -47,22 +47,26 @@ const store = (req, res) => {
 
 //SHOW CONTROLLER
 const show = (req, res) => {
-    const id = parseInt(req.params.id) //TRASFORMO IN UN NUMERO LA STRINGA
-    console.log('Sei nella rotta SHOW')
-    const macchina = macchine.find(macchina => macchina.id === id) //TRAMITE IL FIND SALVO IN UNA VARIABILE SOLO LA RISORSA CHE HA L'ID UGUALE AL PARAMETRO DINAMICO
-    if (!macchina) { //SE IL PARAMETRO DINAMICO NON è PRESENTE
 
-        res.status(404) //RESTITUSICO L'ERRORE
-        console.log('ERRORE: Macchina non trovata');
-        return res.json(
-            {
-                status: 404,
-                error: 'Macchina non trovata'
-            }
-        )
-    }
+    //SALVO IL MIO PARAMETRO DINAMICO
+    const id = req.params.id
 
-    res.send(macchina) //ALTRIMENTI RESITTUISCO L'ELEMENTO CERCATO
+    //SALVO LA MIA SQL QUERY
+    const sqlQuery = 'SELECT * FROM POSTS WHERE id = ?'
+    
+    connection.query(sqlQuery, [id], (err, results) => {
+
+        //GESTISCO L'ERRORE LATO SERVER
+        if (err) return res.status(500).json({ error: 'Errore interno del database', status: 500 })
+        
+        //GESTISCO L'ERRORE LATO CLIENT
+        if(results.length == 0) return res.status(404).json({ error: 'Not Found', status: 404 })
+
+
+       //SE NON ENTRA NELLE DUE CONDIZIONI RESTIUTISCO LA RES CORRETTA
+       res.json(results[0]) //COSI AVREMO SOLO L'OGGETTO CHE CI INTERESSA
+    })
+
 }
 
 //UPDATE CONTROLLER
@@ -106,7 +110,7 @@ const modify = (req, res) => {
 //DESTROY CONTROLLER
 
 const destroy = (req, res) => {
-    
+
     //SALVO IL PARAMETRO DINAMICO DELL'UTENTE
     const id = parseInt(req.params.id)
 
@@ -116,16 +120,16 @@ const destroy = (req, res) => {
     connection.query(sqlQuery, [id], (err, results) => {
 
         //GESTISCO L'ERRORE LATO SERVER
-        if (err) return res.status(500).json({error: 'Errore nel database', status: 500})
+        if (err) return res.status(500).json({ error: 'Errore nel database', status: 500 })
         /* console.log(results); */
-        
+
         //GESTISCO L'ERRORE LATO CLIENT
         if (results.length == 0) return res.status(404).json({ error: 'Nessun post da eliminare', status: 404 })
-        
+
         //SE NON ENTRA NELLE DUE CONDIZIONI RESTIUTISCO LO STATUS CORRETTO
         res.sendStatus(204)
     })
-    
+
 
 }
 
