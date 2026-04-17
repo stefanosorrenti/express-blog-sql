@@ -1,0 +1,15 @@
+//CREO LA MIA MIDDLEWARE CON UN ARROW FUCNTION
+const serverError = (err, req, res, next) => { //INSERISCO I PARAMETRI NECESSARI PER CREARLA E PER GESTIRMI L'ERRORE LATO SERVER
+
+    res.status(500) //IMPOSTO LO STATO
+    console.log(err.stack); //LOGGO NEL TERMINALE IL MESSAGGIO DI ERRORE 
+    
+    
+    res.json({ //NON HO BISOGNO DI NEXT (NON HO NESSUNO A CUI PASSARE 'LA PALLA') MA RESTITUISCO DIRETTAMENTE UNA RISPOSTA (PER EVITARE IL LOOP) IN FORMATO JSON
+        error: "Intenal server error",
+        status: 500
+    })
+
+}
+
+module.exports = serverError //ESPORTO IL TUTTO
