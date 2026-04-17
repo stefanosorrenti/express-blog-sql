@@ -6,7 +6,7 @@ const port = 3000
 const postsRouter = require("./routers/posts")
 const serverError = require("./middlewares/serverError")
 const clientError = require("./middlewares/clientError")
-
+const conn = require('./database/db')
 
 
 app.use(express.json()) //MIDDLEWARE PER EFFETTUARE IL PARSING DEL REQUEST BODY
